@@ -110,12 +110,13 @@ namespace RavenConf.Messaging.Backend
                 Id = defaultDatabase,
                 Settings =
                 {
-                    {"Raven/ActiveBundles", "ScriptedIndexResults"},
+//                    {"Raven/ActiveBundles", "ScriptedIndexResults"},
                     {"Raven/DataDir", "~\\Databases\\Messages"}
                 }
             });
 
             ((DocumentStore)store).DefaultDatabase = defaultDatabase;
+            return;
             new TaskIndex().Execute(store);
 
             using (var session = store.OpenSession())
@@ -163,20 +164,6 @@ namespace RavenConf.Messaging.Backend
                 }
 
                 return string.Format("{0} {1}{2}", step, value, Environment.NewLine);
-            }
-        }
-
-        class RoutingSlip
-        {
-            public static string FormatId(string taskId) { return string.Format("{0}/manifest", taskId); }
-            public string Id { get { return FormatId(TaskId); } }
-            public string TaskId { get; set; }
-            public string[] Steps { get; set; }
-            public Dictionary<string, int> Results { get; set; }
-
-            public RoutingSlip()
-            {
-                Results = new Dictionary<string, int>();
             }
         }
     }

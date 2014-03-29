@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.30110.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RavenConf.Messaging.Backend", "RavenConf.Messaging.Backend\RavenConf.Messaging.Backend.csproj", "{74F4E11D-750B-44B3-9DEC-F89FB3972E33}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RavenConf.Messaging.Worker", "RavenConf.Messaging.Worker\RavenConf.Messaging.Worker.csproj", "{127133C2-9378-4AA2-872A-BFD3D05BFB24}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{74F4E11D-750B-44B3-9DEC-F89FB3972E33}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{74F4E11D-750B-44B3-9DEC-F89FB3972E33}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{74F4E11D-750B-44B3-9DEC-F89FB3972E33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{127133C2-9378-4AA2-872A-BFD3D05BFB24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{127133C2-9378-4AA2-872A-BFD3D05BFB24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{127133C2-9378-4AA2-872A-BFD3D05BFB24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{127133C2-9378-4AA2-872A-BFD3D05BFB24}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
