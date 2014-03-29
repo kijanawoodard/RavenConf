@@ -49,7 +49,7 @@ namespace RavenConf.Messaging.Backend
                         {
                             NumberToSquare = Random.Next(1, 10),
                             NumberToCube = Random.Next(1, 10),
-                            NumberToQuad = Random.Next(1, 10),
+                            NumberToQuadruple = Random.Next(1, 10),
                             Steps = steps.ToArray()
                         };
                         session.Store(task);
@@ -80,7 +80,7 @@ namespace RavenConf.Messaging.Backend
                     {
                         task.NumberToSquare,
                         task.NumberToCube,
-                        task.NumberToQuad,
+                        NumberToQuad = task.NumberToQuadruple,
                         task.Steps
                     };
             }
@@ -91,7 +91,7 @@ namespace RavenConf.Messaging.Backend
                     Id = ScriptedIndexResults.IdPrefix + new TaskIndex().IndexName,
                     IndexScript = @"
                         var routing = {};
-                        routing.Id = this.__document_id + '/routing';
+                        routing.Id = 'routing/' + this.__document_id;
                         routing.TaskId = this.__document_id;
                         routing.Steps = this.Steps;
                         PutDocument(routing.Id, routing);
@@ -110,13 +110,13 @@ namespace RavenConf.Messaging.Backend
                 Id = defaultDatabase,
                 Settings =
                 {
-//                    {"Raven/ActiveBundles", "ScriptedIndexResults"},
+                    {"Raven/ActiveBundles", "ScriptedIndexResults"},
                     {"Raven/DataDir", "~\\Databases\\Messages"}
                 }
             });
 
             ((DocumentStore)store).DefaultDatabase = defaultDatabase;
-            return;
+            
             new TaskIndex().Execute(store);
 
             using (var session = store.OpenSession())
@@ -131,7 +131,7 @@ namespace RavenConf.Messaging.Backend
             public string Id { get; set; }
             public int NumberToSquare { get; set; }
             public int NumberToCube { get; set; }
-            public int NumberToQuad { get; set; }
+            public int NumberToQuadruple { get; set; }
             public string[] Steps { get; set; }
 
             struct Step
@@ -159,7 +159,7 @@ namespace RavenConf.Messaging.Backend
                         value = NumberToCube;
                         break;
                     case Step.Quad:
-                        value = NumberToQuad;
+                        value = NumberToQuadruple;
                         break;
                 }
 
