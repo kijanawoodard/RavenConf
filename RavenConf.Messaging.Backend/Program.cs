@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Raven.Abstractions.Data;
 using Raven.Client;
 using Raven.Client.Document;
@@ -14,6 +12,9 @@ namespace RavenConf.Messaging.Backend
     class Program
     {
         private static readonly Random Random = new Random();
+        private static readonly string[] ExitCommands = { "quit", "x", "exit" };
+        private static string[] _automaticSteps = { "square", "cube" };
+        
         static void Main(string[] args)
         {
             using (var store = new DocumentStore { Url = "http://localhost:8080" }.Initialize())
@@ -28,7 +29,7 @@ namespace RavenConf.Messaging.Backend
                 {
                     Console.Write("Enter the steps: ");
                     var input = Console.ReadLine() ?? string.Empty;
-                    if (input.ToLower() == "quit") break;
+                    if (ExitCommands.Contains(input.ToLower())) break;
 
                     var steps = new List<string>();
                     var chars = input.ToLower().ToArray().Distinct();
@@ -41,7 +42,8 @@ namespace RavenConf.Messaging.Backend
                     }
 
                     var automatic = !steps.Any();
-                    if (automatic) steps.AddRange(new[] {"square", "cube"});
+                    if (automatic) steps.AddRange(_automaticSteps);
+                    _automaticSteps = steps.ToArray();
 
                     using (var session = store.OpenSession())
                     {
@@ -52,12 +54,10 @@ namespace RavenConf.Messaging.Backend
                             NumberToQuadruple = Random.Next(1, 10),
                             Steps = steps.ToArray()
                         };
+                        
                         session.Store(task);
-
-                        /*var manifest = new RoutingSlip { TaskId = task.Id, Steps = new[] { "square", "cube", "display" } };
-                        session.Store(manifest);*/
-
                         session.SaveChanges();
+                        
                         Console.WriteLine("Task Accepted:");
                         Console.WriteLine(task);
                     }
@@ -94,6 +94,7 @@ namespace RavenConf.Messaging.Backend
                         routing.Id = 'routing/' + this.__document_id;
                         routing.TaskId = this.__document_id;
                         routing.Steps = this.Steps;
+                        routing.Updated = new Date();
                         PutDocument(routing.Id, routing);
                         
                         routing = LoadDocument(routing.Id);

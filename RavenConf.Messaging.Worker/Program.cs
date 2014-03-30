@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Timers;
@@ -77,7 +78,7 @@ namespace RavenConf.Messaging.Worker
                     _work = new QuadService.Worker(_store).Work;
                     break;
                 case "shaker":
-                    _work = notification => Console.WriteLine("I see changes for {0}", notification.Id);
+                    _work = notification => Console.Write(".");// Console.WriteLine("I see changes for {0}", notification.Id);
                     _timer = new Timer(5000);
                     _timer.AutoReset = false;
                     _timer.Elapsed += TimerOnElapsed;
@@ -90,6 +91,7 @@ namespace RavenConf.Messaging.Worker
                     break;
             }
             
+            LoadSleepConfiguration();
             Console.WriteLine("Running in {0} mode.", arg);          
         }
 
@@ -109,21 +111,24 @@ namespace RavenConf.Messaging.Worker
 
         private static void ShakeTasks()
         {
+            var sw = Stopwatch.StartNew();
             using (var session = _store.OpenSession())
             using (var enumerator = session.Advanced.Stream<RoutingSlip>(
                                                                 startsWith: "routing/",
-                                                      start: 0, pageSize: int.MaxValue))
+                                                                start: 0, pageSize: int.MaxValue))
             {
                 while (enumerator.MoveNext())
                 {
                     var slip = enumerator.Current.Document;
                     if (slip.IsInGoodShape()) continue;
-
+                    
                     slip.Shake();
                     session.Store(slip);
-                    session.SaveChanges();
                 }
+                session.SaveChanges();
             }
+            sw.Stop();
+            Console.WriteLine("Shake took {0} ms", Math.Round((double)sw.ElapsedMilliseconds, 3));
         }
 
         private static void SetSleep(int sleep)
@@ -147,13 +152,17 @@ namespace RavenConf.Messaging.Worker
         private static void AdjustSleep(DocumentChangeNotification change)
         {
             if (change.Type != DocumentChangeTypes.Put) return;
+            LoadSleepConfiguration();
+        }
 
+        private static void LoadSleepConfiguration()
+        {
             using (var session = _store.OpenSession())
             {
                 var config = session.Load<Configuration>(Configuration.StableId);
                 WorkerSleep = config.WorkerSleepInMilliseconds;
             }
-            Console.WriteLine("Will now sleep to {0}", WorkerSleep);
+            Console.WriteLine("Will sleep for {0} ms", WorkerSleep);
         }
     }
 
