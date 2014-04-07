@@ -85,7 +85,7 @@ namespace RavenConf.Messaging.Backend
                     };
             }
 
-            public static ScriptedIndexResults Sir =
+            public static readonly ScriptedIndexResults Sir =
                 new ScriptedIndexResults
                 {
                     Id = ScriptedIndexResults.IdPrefix + new TaskIndex().IndexName,
